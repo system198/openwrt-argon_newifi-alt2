@@ -22,8 +22,8 @@ on:
 #    - cron: 0 8 * * 5
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
+  REPO_URL: https://github.com/openwrt/openwrt
+  REPO_BRANCH: v19.07.5
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: .config
   DIY_P1_SH: diy-part1.sh
@@ -60,7 +60,7 @@ jobs:
       working-directory: /workdir
       run: |
         df -hT $PWD
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        git clone git://github.com/openwrt/openwrt.git -b v19.07.5
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Load custom feeds
@@ -69,7 +69,10 @@ jobs:
         chmod +x $DIY_P1_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
-
+        
+    - name: Add luci-theme-argon (Newifi mod) to package
+      run: cd openwrt/package && git clone https://github.com/system198/luci-theme-argon.git
+      
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
